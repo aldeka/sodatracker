@@ -1,0 +1,94 @@
+@textcolor: #222;
+
+body {
+    font-size: 12pt;
+}
+
+body, h1, h2, h3, h4, h5 {
+    font-family: 'Merriweather Sans', sans-serif;
+    color: @textcolor;
+}
+
+h2 {
+    margin-top: 0;
+    border-bottom: 1pt solid @textcolor;
+}
+
+.clearer {
+    clear: both;
+}
+
+#stations {
+    ul {
+        list-style-type: none;
+        padding: 0;
+        li {
+            background: #f9f9f9;
+            padding: 10px 10px 20px 10px;
+            margin-bottom: 5px;
+        }
+    }
+
+    h3, h4 {
+        margin-top: 0;
+    }
+
+    h4 {
+        margin: 0;
+    }
+
+    .station-sodas {
+        list-style-type: none;
+        float: right;
+        .the-sodas {
+            display: inline;
+        }
+        li {
+            padding: 0;
+            display: inline;
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .adder-group {
+            &.no-button {
+                display: none;
+            }
+            ul {
+                padding-top: 5px;
+                padding-bottom: 5px;
+            }
+            li {
+                padding: 0;
+                display: block;
+                background: white;
+                margin: 0;
+            }
+        }
+        .adder {
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: #eee;
+            &:hover {
+                background: #e0e0e0;
+            }
+        }
+    }
+}
+
+#sodas {
+    ul {
+        list-style-type: none;
+        padding: 0;
+        li div {
+            background: #f9f9f9;
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            border: 4pt solid #eee;
+
+            &:hover {
+                background: white;
+            }
+        }
+    }
+}
