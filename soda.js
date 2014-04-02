@@ -1,37 +1,74 @@
-$(document).ready(function(){
+$(document).ready(function() {
+    var i, j, k;
+    var filters = [];
+
+    /* data */
     var sodas = [
         {
             id: 1,
-            name: "Barq's",
-            color: "#ff9900"
+            name: "Coke",
+            color: "red"
         },
         {
             id: 2,
-            name: "Squirt",
+            name: "Diet Coke w. Lime",
             color: "#0f9950"
         },
         {
             id: 3,
-            name: "Diet Coke with Lime",
-            color: "#99dd00"
+            name: "Barq's",
+            color: "#ffaa00"
+        },
+        {
+            id: 4,
+            name: "Squirt",
+            color: "#cfcc00"
+        },
+        {
+            id: 5,
+            name: "Coconut water",
+            color: "#d000cc"
+        },
+        {
+            id: 6,
+            name: "Canada Dry",
+            color: "#0000cc"
         }
     ];
     var stations = [
         {
             id: 1,
             name: "Station One",
-            loc: "Building 24, 3rd floor break room",
-            sodas: [sodas[0], sodas[2]],
+            loc: "Building 11, 2nd floor break room",
+            sodas: [sodas[0], sodas[2], sodas[4], sodas[5]]
+        },
+        {
+            id: 2,
+            name: "Station Two",
+            loc: "Building 42, first floor elevator",
+            sodas: [sodas[3], sodas[2]]
+        },
+        {
+            id: 3,
+            name: "Troll Refueling Station",
+            loc: "Under the bridge",
+            sodas: [sodas[3], sodas[1], sodas[2]]
+        },
+        {
+            id: 4,
+            name: "Welcome Station",
+            loc: "Building 11 atrium",
+            sodas: [sodas[0], sodas[4], sodas[1]]
         }
     ];
 
     /* For a given station, returns list of sodas the station doesn't already have */
-    var processedSodas = function(station){
+    var processedSodas = function(station) {
         var processed = [];
-        for(i=0; i<sodas.length; i++) {
-            var temp = sodas[i];
-            for(j=0; j<station.sodas.length; j++) {
-                if (sodas[i] === station.sodas[j]){
+        for(j=0; j<sodas.length; j++) {
+            var temp = sodas[j];
+            for(k=0; k<station.sodas.length; k++) {
+                if (sodas[j] === station.sodas[k]){
                     temp = undefined;
                 }
             }
@@ -42,56 +79,50 @@ $(document).ready(function(){
         return processed;
     };
 
-    var initializeStation = function(station){
-        var id = station.id.toString();
-        var remainingSodas = processedSodas(station);
+    var initializeStation = function(station) {
+        var stationID = station.id.toString();
         // make base station template
         $('#station-template').tmpl(station).appendTo('.station-list');
         // fill in sodas the station has
         $('#the-sodas-template').tmpl(
             {'sodas': station.sodas}
-            ).appendTo('#station-' + id + ' .the-sodas:first-child');
+            ).appendTo('#station-' + stationID + ' .the-sodas:first-child');
         // fill in dropdown menu with the sodas the station doesn't have
         $('#soda-dropdown-template').tmpl(
             {
-                'sodas': remainingSodas
+                'sodas': processedSodas(station)
             }
-            ).appendTo('#station-'+ id +' .dropdown-menu');
+            ).appendTo('#station-'+ stationID +' .dropdown-menu');
     };
 
-    // initialize soda list
-    for (i=0; i<sodas.length; i++) {
-        $('#soda-template').tmpl(sodas[i]).appendTo('.soda-list');
+    var initApp = function() {
+        // initialize soda list
+        for (i=0; i<sodas.length; i++) {
+            $('#soda-template').tmpl(sodas[i]).appendTo('.soda-list');
+        }
+
+        // initialize stations list
+        for (i=0; i<stations.length; i++) {
+            initializeStation(stations[i]);
+        }
     }
 
-    // initialize stations list
-    for (i=0; i<stations.length; i++) {
-        initializeStation(stations[i]);
-    }
-
-    $('body').on('click', '.station .dropdown-menu a', function(e){
+    /* Handler for menu for adding new sodas to stations */
+    $('body').on('click', '.station .dropdown-menu a', function(e) {
         e.preventDefault();
-        console.log('clicked');
         var soda, station, remainingSodas;
         var sodaID = $(this).attr('data-attribute').slice(5);
         var stationID = $($(this).parents('.station')[0]).attr('id').slice(8);
-        console.log(sodaID);
-        console.log(stationID);
         for (i=0; i<sodas.length; i++){
             if (sodas[i].id === parseInt(sodaID,10)){
                 soda = sodas[i];
                 break;
             }
         }
-        console.log(soda);
         if (soda){
-            console.log(stations.length);
             for (i=0; i<stations.length; i++) {
-                console.log(stations[i]);
-                console.log(parseInt(stationID,10));
                 if (stations[i].id === parseInt(stationID,10)) {
                     station = stations[i];
-                    console.log(station);
                     // add to station's sodas
                     station.sodas.push(soda);
                     $('#station-' + stationID + ' .the-sodas').empty();
@@ -113,7 +144,53 @@ $(document).ready(function(){
         }
     });
 
-    $('body').on('submit', '#sodamaker', function(e){
+    /* Filtering stations by soda offered */
+    $('body').on('click', '#sodas ul div', function(e) {
+        var sodaID, acceptable_stations;
+        // toggle soda style
+        $(this).toggleClass('active');
+        sodaID = $(this).attr('data-attribute').slice(5);
+        // toggling filter
+        // check if filter already exists, and if so, remove it
+        for (i=0; i<filters.length; i++) {
+            if (filters[i] === parseInt(sodaID,10)) {
+                filters.splice(i, 1);
+                sodaID = '';
+                break;
+            }
+        }
+        // add new filter, if it exists
+        if (sodaID) {
+            filters.push(parseInt(sodaID,10));
+        }
+        // remove class filtered from all matching stations
+        // add class filtered to any station we want filtered out
+        if (filters.length === 0) {
+            $('.station').removeClass('filtered');
+        } else {
+            // populate list of visible stations' IDs
+            acceptable_stations = [];
+            for (i=0; i<stations.length; i++) {
+                var station = stations[i];
+                for (j=0; j<filters.length; j++) {
+                    for (k=0; k<station.sodas.length; k++) {
+                        if (station.sodas[k].id === filters[j]) {
+                            acceptable_stations.push(station.id);
+                        }
+                    }
+                }
+            }
+            // we filter everything...
+            $('.station').addClass('filtered');
+            // then remove the class selectively
+            for (i=0; i<acceptable_stations.length; i++) {
+                $('#station-' + acceptable_stations[i].toString()).removeClass('filtered');
+            }
+        }
+    });
+
+    /* Creating a new soda */
+    $('body').on('submit', '#sodamaker', function(e) {
         e.preventDefault();
         var newSoda;
         var sodaName = $(this).find('[name="name"]').val();
@@ -139,7 +216,8 @@ $(document).ready(function(){
         }
     });
 
-    $('body').on('submit', '#stationmaker', function(e){
+    /* Creating a new station */
+    $('body').on('submit', '#stationmaker', function(e) {
         e.preventDefault();
         var stationName, stationLoc;
         stationName = $(this).find('[name="name"]').val();
@@ -158,33 +236,13 @@ $(document).ready(function(){
         }
     });
 
-    var getRandomInt = function(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
+    initApp();
 
-    var shuffle = function(array) {
-      var currentIndex = array.length, temporaryValue, randomIndex;
-
-      // While there remain elements to shuffle...
-      while (0 !== currentIndex) {
-
-        // Pick a remaining element...
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        // And swap it with the current element.
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-      }
-
-      return array;
-    };
-
+    /* Generates random hex color within some brightness constraints*/
     var generateColor = function() {
         var color1, color2, color3, result;
-        var minBrightness = 400;
-        var maxBrightness = 600;
+        var minBrightness = 300;
+        var maxBrightness = 550;
 
         color1 = getRandomInt(0,255);
         color2 = getRandomInt(0,255);
@@ -207,5 +265,30 @@ $(document).ready(function(){
             result += color;
         }
         return "#" + result;
+    };
+
+    /* Helper functions */
+
+    var getRandomInt = function(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+
+    var shuffle = function(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex;
+
+      // While there remain elements to shuffle...
+      while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+
+      return array;
     };
 });

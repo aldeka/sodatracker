@@ -1,21 +1,59 @@
 @textcolor: #222;
+@rackerred: #c50022;
 
 body {
     font-size: 12pt;
 }
 
 body, h1, h2, h3, h4, h5 {
-    font-family: 'Merriweather Sans', sans-serif;
+    font-family: 'Source Sans Pro', 'Merriweather Sans', 'Helvetica Neue', Helvetica, sans-serif;
     color: @textcolor;
 }
 
 h2 {
-    margin-top: 0;
+    margin-top: 1em;
     border-bottom: 1pt solid @textcolor;
 }
 
-.clearer {
-    clear: both;
+h3, h4 {
+    margin-top: 0;
+}
+
+h4 {
+    margin: 0;
+    color: lighten(@textcolor, 40%);
+}
+
+.navbar {
+    background: @rackerred;
+    border-radius: 0;
+    border-top: darken(@rackerred, 10%);
+    border-bottom: darken(@rackerred, 20%);
+    border-right: none;
+    border-left: none;
+
+    .title {
+        margin-top: 4px;
+        font-size: 2em;
+        text-decoration: none;
+        color: white;
+    }
+}
+
+.navbar-nav > li > a {
+    color: lighten(@rackerred, 50%);
+    &:hover {
+        background-color: darken(@rackerred, 10%);
+        color: white;
+    }
+}
+
+.main-container {
+    padding-bottom: 2em;
+}
+
+#stationmaker {
+    margin-top: 2em;
 }
 
 #stations {
@@ -28,18 +66,11 @@ h2 {
             margin-bottom: 5px;
         }
     }
-
-    h3, h4 {
-        margin-top: 0;
-    }
-
-    h4 {
-        margin: 0;
-    }
-
     .station-sodas {
         list-style-type: none;
         float: right;
+        font-size: 1.2em;
+
         .the-sodas {
             display: inline;
         }
@@ -48,10 +79,14 @@ h2 {
             display: inline;
             margin-left: 0;
             margin-right: 0;
+            span {
+                cursor: help;
+            }
         }
         .adder-group {
-            &.no-button {
-                display: none;
+            button {
+                font-size: 1.2em;
+                padding: 0 5px;
             }
             ul {
                 padding-top: 5px;
@@ -64,14 +99,10 @@ h2 {
                 margin: 0;
             }
         }
-        .adder {
-            padding: 5px 10px;
-            border-radius: 15px;
-            background: #eee;
-            &:hover {
-                background: #e0e0e0;
-            }
-        }
+    }
+
+    .filtered {
+        display: none;
     }
 }
 
@@ -79,16 +110,31 @@ h2 {
     ul {
         list-style-type: none;
         padding: 0;
+        font-size: 1.2em;
         li div {
             background: #f9f9f9;
             padding: 5px;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             border-radius: 10px;
             border: 4pt solid #eee;
+            cursor: pointer;
 
             &:hover {
                 background: white;
             }
+            &.active {
+                background: #ffff66;
+                box-shadow: 0 1px 4px 1px rgba(0,0,0,.2);
+            }
         }
+    }
+    form input {
+        /*font-size: 1.2em;*/
+    }
+}
+
+@media (max-width: 767px) {
+    .navbar ul li {
+        margin-left: 1em;
     }
 }
